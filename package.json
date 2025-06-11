@@ -1,0 +1,17 @@
+{
+  "name": "routeviewapp",
+  "version": "1.0.0",
+  "description": "An app to help Translink bus drivers to learn their routes.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Matin Hassan Pour",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parse": "^5.6.0",
+    "express": "^5.1.0",
+    "haversine-distance": "^1.2.3"
+  }
+}

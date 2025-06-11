@@ -1,0 +1,301 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+#map {
+  height: 100vh;
+}
+
+/* Hide default Leaflet controls */
+.leaflet-control-zoom {
+  display: none;
+}
+
+.leaflet-control-attribution {
+  background: white;
+  border-radius: 4px;
+  font-size: 10px;
+  padding: 4px 8px;
+  margin: 8px;
+  border: 1px solid #ccc;
+}
+
+/* Simple zoom controls */
+.custom-zoom-control {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.zoom-btn {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: white;
+  font-size: 18px;
+  cursor: pointer;
+  color: #333;
+}
+
+.zoom-btn:hover {
+  background: #f0f0f0;
+}
+
+.zoom-in {
+  border-bottom: 1px solid #ccc;
+}
+
+/* Route info panel */
+#route-info {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background: white;
+  padding: 12px 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  color: #333;
+  max-width: 300px;
+}
+
+/* Simple popup styling */
+.leaflet-popup-content-wrapper {
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: white;
+}
+
+.leaflet-popup-content {
+  margin: 12px 16px;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Simple marker styles */
+.custom-stop-marker {
+  background: #ff4444;
+  border: 2px solid white;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+}
+
+/* Trip selector styling */
+#trip-selector {
+  position: absolute;
+  top: 20px;
+  right: 80px;
+  z-index: 1000;
+}
+
+#trip-toggle-btn {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #333;
+  min-width: 150px;
+  text-align: left;
+}
+
+#trip-toggle-btn:hover {
+  background: #f0f0f0;
+}
+
+/* Search input styling */
+#route-search-input {
+  width: 100%;
+  max-width: 500px;
+  font-size: 1.1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  outline: none;
+  transition: border 0.2s ease-in-out;
+}
+
+#route-search-input:focus {
+  border-color: #007BFF;
+}
+
+/* Modal Styling */
+#main-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+/* Modal content */
+#main-content {
+  background: white;
+  padding: 2rem 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+#main-content #main-headsign {
+  width: 100%;
+  height: 5rem;
+  text-align: center;
+  background-color: rgb(40, 40, 40);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(255, 190, 0, 1.5)
+}
+
+/* Headings */
+#main-content h1 {
+  color: rgb(255, 190, 0);
+  font-family: "Jersey 10", sans-serif;
+  font-style: normal;
+  font-size: 5rem;
+  margin: 0;
+  line-height: 1;
+}
+
+#main-content h3 {
+  margin-top: 1rem;
+  font-weight: 400;
+  color: #555;
+}
+
+/* Divider */
+#main-content hr {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+/* Input */
+#main-content input[type="text"] {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1.1rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  margin-bottom: 1.2rem;
+  outline: none;
+  box-sizing: border-box;
+}
+
+#main-content p {
+  text-align: left;
+  margin: 10px;
+  color: gray;
+}
+
+/* Route search results inside modal */
+#route-search-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ededed;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#route-search-results li {
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+#route-search-results li:last-child {
+  border-bottom: none;
+}
+
+#route-search-results li:hover {
+  background: #f0f0f0;
+}
+
+#main-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+#main-buttons button {
+  width: 12rem;
+  height: 3rem;
+  background-color: black;
+  color: white;
+  margin-top: 20px;
+  font-size: medium;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 7px;
+  border: 0px solid white;
+}
+
+#main-buttons button:hover {
+  background-color: rgb(255, 190, 0);
+  color: black;
+  transition: 0.2s;
+  box-shadow: 0 2px 8px rgb(250, 215, 100, 1);
+}
+
+/* Headsign style */
+.head-sign {
+  background-color: rgb(40, 40, 40);
+  width: 800px;
+  height: 150px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 20px;
+  position: relative;
+  padding-left: 50px;
+  padding-right: 50px;
+}
+
+/* .left {
+  flex: 0 0 auto;
+}
+
+.center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+} */
+
+.bus-number, .bus-route {
+  color: rgb(255, 190, 0);
+  font-family: "Jersey 10", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 120px;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1;
+}

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>RouteView</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="./index.css" />
+  </head>
+  <body>
+    
+    <div id="main-modal">
+      <div id="main-content">
+        <div id="main-headsign">
+          <h1>RouteView</h1>
+        </div>
+        <h3>Learning bus routes made easier...</h3>
+        <hr />
+        <p>Select route:</p>
+        <input
+          type="text"
+          id="route-search-input"
+          placeholder="Search route number or name..."
+        />
+        <ul id="route-search-results"></ul>
+        <!-- <div id="main-buttons">
+          <button>Show Route</button>
+          <button>Print Cheatsheet</button>
+        </div> -->
+      </div>
+    </div>
+
+    <!-- <div id="route-info" class="loading">Loading route info...</div> -->
+
+    <div id="trip-selector">
+      <button id="trip-toggle-btn">Select Direction</button>
+    </div>
+    <div id="map"></div>
+
+    <!-- Custom zoom controls -->
+    <div class="custom-zoom-control">
+      <button class="zoom-btn zoom-in" onclick="zoomIn()">+</button>
+      <button class="zoom-btn zoom-out" onclick="zoomOut()">−</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.js" integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="./shape.geojson.js"></script>
+    <script src="./routesIndex.js"></script>
+    <script>
+      // Initialize map with custom options
+      const map = L.map('map', {
+        zoomControl: false,
+        attributionControl: true
+      }).setView([49.25, -123.1], 10);
+
+      // Use OpenStreetMap default tiles (most reliable and free)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(map);
+
+
+      // Variables to hold current layers
+      let currentRouteLayer = null;
+      let currentStopsLayer = null;
+
+      // Custom zoom functions
+      function zoomIn() {
+        map.zoomIn();
+      }
+
+      function zoomOut() {
+        map.zoomOut();
+      }
+
+      // Function to update map with current trip data
+      function updateMapForTrip() {
+        // Remove existing layers
+        if (currentRouteLayer) {
+          map.removeLayer(currentRouteLayer);
+        }
+        if (currentStopsLayer) {
+          map.removeLayer(currentStopsLayer);
+        }
+
+        // Get current trip data
+        const currentTrip = getCurrentTrip();
+
+        // Add route line
+        currentRouteLayer = L.geoJSON(currentTrip.shape, {
+          style: { 
+            color: '#2196F3', 
+            weight: 3,
+            opacity: 0.8
+          }
+        }).addTo(map);
+
+        // Create simple stop marker icon
+        const customStopIcon = L.divIcon({
+          className: 'custom-stop-marker',
+          iconSize: [12, 12],
+          iconAnchor: [6, 6]
+        });
+
+        // Add stop markers
+        currentStopsLayer = L.geoJSON(currentTrip.stops, {
+          pointToLayer: (feature, latlng) =>
+            L.marker(latlng, { icon: customStopIcon })
+              .bindPopup(`<b>${feature.properties.name}</b>`)
+        }).addTo(map);
+
+        // Update trip selector button
+        const tripBtn = document.getElementById('trip-toggle-btn');
+        if (tripBtn) {
+          tripBtn.textContent = currentTrip.headsign;
+        }
+
+        // Fit map to show the route
+        if (currentTrip.shape.geometry.coordinates.length > 0) {
+          map.fitBounds(currentRouteLayer.getBounds(), { padding: [20, 20] });
+        }
+      }
+
+      // Function to cycle through trips
+      function toggleTrip() {
+        if (typeof tripsData !== 'undefined' && tripsData.length > 0) {
+          currentTripIndex = (currentTripIndex + 1) % tripsData.length;
+          updateMapForTrip();
+        }
+      }
+
+      // Initialize trip selector
+      document.getElementById('trip-toggle-btn').addEventListener('click', toggleTrip);
+
+      // Display route info and initialize map
+      if (typeof routeInfo !== 'undefined' && routeInfo) {
+        const routeInfoElement = document.getElementById('route-info');
+        // note: use signs.html design here
+        routeInfoElement.innerHTML = `<strong>Route ${routeInfo.route_short_name}</strong><br>${routeInfo.route_long_name}`;
+        routeInfoElement.classList.remove('loading');
+      } else {
+      // Fallback if routeInfo is not available
+        setTimeout(() => {
+          const routeInfoElement = document.getElementById('route-info');
+          routeInfoElement.innerHTML = '<strong>Route View</strong><br>Transit route visualization';
+          routeInfoElement.classList.remove('loading');
+        }, 1000);
+      }
+
+      // Initialize the map with the first trip
+      if (typeof tripsData !== 'undefined' && tripsData.length > 0) {
+        updateMapForTrip();
+      } else {
+        console.error('No trips data available');
+      }
+    </script>
+    <script>
+      $('#route-search-input').on('input', function () {
+        const query = $(this).val().toLowerCase();
+        const matches = routesIndex
+          .filter(r =>
+            r.short.toLowerCase().includes(query) ||
+            r.long.toLowerCase().includes(query)
+          )
+          .sort((a, b) => a.short.localeCompare(b.short));
+
+        $('#route-search-results').empty();
+        matches.forEach(route => {
+          $('#route-search-results').append(
+            `<li data-id="${route.id}">${route.short} ${route.long}</li>`
+          );
+        });
+      });
+
+      $('#route-search-results').on('click', 'li', async function () {
+        const routeId = $(this).data('id');
+
+        // Call a backend endpoint (or script) to regenerate shape.geojson.js
+        const response = await fetch(`/api/export-route?routeId=${routeId}`);
+        if (response.ok) {
+          location.reload(); // reload map with new shape.geojson.js
+        } else {
+          alert('Failed to load route');
+        }
+      });
+    </script>
+  </body>
+</html>
